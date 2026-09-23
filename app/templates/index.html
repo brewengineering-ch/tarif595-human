@@ -43,7 +43,20 @@
         </div>
       </fieldset>
 
-      <button type="submit">Download PDF</button>
+      <div class="grid">
+        <button type="submit" name="action" value="invoice">
+          1. Rechnung (QR-Bill)
+        </button>
+        <button type="submit" name="action" value="reimbursement">
+          2. Rückforderungsbeleg
+        </button>
+        <button type="submit" name="action" value="machine">
+          3. XML QR-Codes
+        </button>
+        <button type="submit" name="action" value="all" class="contrast">
+          Alle (Kombiniert)
+        </button>
+      </div>
     </form>
 
     <p><small>For developers: interactive API docs are available at <a href="/docs">/docs</a>.</small></p>
