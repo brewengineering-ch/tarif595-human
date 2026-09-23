@@ -3,8 +3,7 @@ import time
 import uuid
 from datetime import datetime
 from jinja2 import Environment, FileSystemLoader
-
-from app.schemas import InvoiceData
+from app.schemas import Tarif595Data
 
 jinja_env = Environment(
     loader=FileSystemLoader("app/templates"),
@@ -26,7 +25,7 @@ def generate_document_id() -> str:
     return f"{raw_id} / {ts_str} / {doc_hash}"
 
 
-def build_general_invoice_xml(data: InvoiceData, doc_id: str) -> str:
+def build_general_invoice_xml(data: Tarif595Data, doc_id: str) -> str:
     """Build a minimal valid XML document conforming to generalInvoiceRequest_500.xsd."""
     now = datetime.now()
     service_date_iso = data.service_date.strftime("%Y-%m-%d")
