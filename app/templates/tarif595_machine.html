@@ -1,0 +1,93 @@
+{% extends "tarif595_base.html" %}
+
+{% block title %}Kodierter Rückforderungsbeleg{% endblock %}
+{% block banner_title %}Kodierter Rückforderungsbeleg{% endblock %}
+{% block release_subtitle %}XML 2D-Code{% endblock %}
+
+{% block extra_styles %}
+  .notice {
+    border: 1px solid #000;
+    padding: 3mm;
+    font-size: 8pt;
+    margin-bottom: 6mm;
+    line-height: 1.4;
+  }
+
+  .qr-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8mm;
+    margin-top: 4mm;
+  }
+
+  .qr-card {
+    border: 1px solid #888;
+    padding: 4mm;
+    text-align: center;
+    width: 75mm;
+    box-sizing: border-box;
+  }
+
+  .qr-card h4 { margin: 0 0 3mm 0; font-size: 8.5pt; font-weight: bold; }
+  .qr-card img { width: 65mm; height: 65mm; display: block; margin: 0 auto; }
+  .qr-card small { display: block; margin-top: 2mm; font-size: 6.5pt; color: #444; }
+
+  .footer-summary {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border-top: 1.5px solid #000;
+    padding-top: 3mm;
+    display: flex;
+    justify-content: space-between;
+    font-size: 8pt;
+  }
+{% endblock %}
+
+{% block content %}
+  <table class="meta-box">
+    <tr>
+      <td class="label-col">Dokument</td>
+      <td><strong>Identifikation:</strong> {{ doc_id }}</td>
+    </tr>
+    <tr>
+      <td class="label-col">Rechnungssteller</td>
+      <td>
+        <strong>GLN:</strong> {{ company_gln }} &bull;
+        <strong>{{ company_name }}</strong>, {{ company_street }}, {{ company_zip_code }} {{ company_city }}
+      </td>
+    </tr>
+    <tr>
+      <td class="label-col">Patient</td>
+      <td>
+        <strong>{{ client_first_name }} {{ client_last_name }}</strong>,
+        {{ client_street }}, {{ client_zip_code }} {{ client_city }} &bull;
+        <strong>AHV:</strong> {{ client_ssn }}
+      </td>
+    </tr>
+  </table>
+
+  <div class="notice">
+    <strong>Hinweis für den Versicherer / Scan-Center:</strong><br>
+    Die untenstehenden 2D-Codes enthalten die vollständigen Rechnungsdaten gemäss
+    <strong>Forum Datenaustausch General Invoice Release 5.0 (Tarif 595)</strong> im XML-Format.
+    Bei mehreren Codes sind diese fortlaufend (Teil 1/N bis Teil N/N) einzulesen.
+  </div>
+
+  <div class="qr-grid">
+    {% for qr in qr_codes %}
+    <div class="qr-card">
+      <h4>{{ qr.label }}</h4>
+      <img src="{{ qr.svg_uri }}" alt="{{ qr.label }}">
+      <small>generalInvoiceRequest_500 ({{ qr.index }}/{{ qr.total }})</small>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="footer-summary">
+    <div><strong>Totalbetrag:</strong> CHF {{ "%.2f"|format(service_amount) }}</div>
+    <div><strong>Standard:</strong> General Invoice 5.0 (Tarif 595)</div>
+  </div>
+{% endblock %}

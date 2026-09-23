@@ -1,0 +1,208 @@
+{% extends "tarif595_base.html" %}
+
+{% block title %}Rückforderungsbeleg{% endblock %}
+{% block banner_title %}Rückforderungsbeleg{% endblock %}
+{% block release_subtitle %}Der Versicherung zustellen{% endblock %}
+
+{% block extra_styles %}
+  .patient-container {
+    display: flex;
+    border: 1.2px solid #000;
+    margin-bottom: 2mm;
+  }
+
+  .patient-details {
+    flex: 1;
+    border-right: 1px solid #000;
+  }
+
+  .patient-details table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .patient-details td {
+    padding: 1.5px 4px;
+    font-size: 7.5pt;
+  }
+
+  .patient-address-window {
+    width: 75mm;
+    padding: 12mm 8mm 5mm 8mm;
+    font-size: 9pt;
+    line-height: 1.35;
+  }
+
+  table.services {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 3mm;
+  }
+
+  table.services thead {
+    display: table-header-group;
+  }
+
+  table.services th {
+    font-size: 7pt;
+    padding: 3px 2px;
+    border-bottom: 1.5px solid #000;
+    text-align: left;
+  }
+
+  table.services td {
+    font-size: 7.5pt;
+    padding: 2px 2px;
+    border-bottom: 1px dotted #888;
+  }
+
+  .text-right { text-align: right; }
+  .service-desc { font-size: 7pt; color: #222; padding-left: 3mm; }
+  .page-num::after { content: counter(page); }
+
+  .summary-section {
+    page-break-inside: avoid;
+    margin-top: 6mm;
+    padding-top: 3mm;
+    border-top: 1.5px solid #000;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    font-size: 7.5pt;
+  }
+
+  .vat-table, .totals-box { border-collapse: collapse; font-size: 7.5pt; }
+  .vat-table th, .vat-table td { padding: 1px 5px; text-align: right; }
+  .vat-table th { font-weight: normal; border-bottom: 1px solid #000; }
+  .vat-info { font-size: 7.5pt; line-height: 1.5; }
+  .totals-box td { padding: 2px 6px; }
+
+  .invoice-total-row td {
+    font-size: 9pt;
+    font-weight: bold;
+    border-top: 1px solid #000;
+    border-bottom: 3px double #000;
+    padding-top: 3px;
+    padding-bottom: 3px;
+  }
+{% endblock %}
+
+{% block content %}
+  <table class="meta-box">
+    <tr>
+      <td class="label-col">Dokument</td>
+      <td><strong>Identifikation:</strong> {{ doc_id }}</td>
+      <td style="width: 20mm; text-align: right;">
+        Seite: <span class="page-num"></span>
+      </td>
+    </tr>
+    <tr>
+      <td class="label-col">Rechnungssteller</td>
+      <td colspan="2">
+        <strong>GLN:</strong> {{ company_gln }} &bull;
+        <strong>{{ company_name }}</strong>, {{ company_street }}, {{ company_zip_code }} {{ company_city }}
+      </td>
+    </tr>
+  </table>
+
+  <!-- Patient & Address Section -->
+  <div class="patient-container">
+    <div class="patient-details">
+      <table>
+        <tr><td colspan="2" style="border-bottom: 1px solid #000;"><strong>Patient</strong></td></tr>
+        <tr><td>Name:</td><td><strong>{{ client_last_name }}</strong></td></tr>
+        <tr><td>Vorname:</td><td><strong>{{ client_first_name }}</strong></td></tr>
+        <tr><td>Strasse:</td><td>{{ client_street }}</td></tr>
+        <tr><td>PLZ / Ort:</td><td>{{ client_zip_code }} {{ client_city }}</td></tr>
+        <tr><td>Geburtsdatum:</td><td>{{ client_birthdate.strftime('%d.%m.%Y') }}</td></tr>
+        <tr><td>Gesetz / Art:</td><td>KVG / ambulant</td></tr>
+        <tr><td>Behandlungsgrund:</td><td>Krankheit</td></tr>
+        <tr><td>Behandlungsdatum:</td><td>{{ service_date.strftime('%d.%m.%Y') }}</td></tr>
+      </table>
+    </div>
+
+    <div class="patient-address-window">
+      <strong>{{ client_first_name }} {{ client_last_name }}</strong><br>
+      {{ client_street }}<br>
+      {{ client_zip_code }} {{ client_city }}
+    </div>
+  </div>
+
+  <table class="meta-box">
+    <tr>
+      <td class="label-col">Diagnose</td>
+      <td>TI=N1</td>
+    </tr>
+  </table>
+
+  <table class="services">
+    <thead>
+      <tr>
+        <th>Datum</th>
+        <th>Tarif</th>
+        <th>Tarifziffer</th>
+        <th>Anzahl</th>
+        <th class="text-right">TP AL/Preis</th>
+        <th class="text-right">TP TL</th>
+        <th class="text-right">Betrag (CHF)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in services %}
+      <tr>
+        <td>{{ item.date }}</td>
+        <td>595</td>
+        <td><strong>{{ item.code }}</strong></td>
+        <td>{{ item.quantity }}</td>
+        <td class="text-right">{{ "%.2f"|format(item.amount) }}</td>
+        <td class="text-right">-</td>
+        <td class="text-right"><strong>{{ "%.2f"|format(item.amount * item.quantity) }}</strong></td>
+      </tr>
+      <tr>
+        <td colspan="7" class="service-desc">&rdsh; {{ item.description }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="summary-section">
+    <div>
+      <table class="vat-table">
+        <thead>
+          <tr>
+            <th style="text-align: left;">Code</th>
+            <th>Satz</th>
+            <th>Betrag</th>
+            <th>MWSt</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="text-align: left;">0</td>
+            <td>0.00</td>
+            <td>{{ "%.2f"|format(total_amount) }}</td>
+            <td>0.00</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="vat-info">
+      <div><strong>MWSt.-Nr.:</strong> CHE-000.000.000 MWST</div>
+      <div><strong>Währung:</strong> CHF</div>
+    </div>
+
+    <div>
+      <table class="totals-box">
+        <tr>
+          <td>Gesamtbetrag:</td>
+          <td class="text-right">{{ "%.2f"|format(total_amount) }}</td>
+        </tr>
+        <tr class="invoice-total-row">
+          <td>Rechnungsbetrag:</td>
+          <td class="text-right">{{ "%.2f"|format(total_amount) }}</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+{% endblock %}

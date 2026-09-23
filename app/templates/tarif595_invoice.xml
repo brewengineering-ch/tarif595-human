@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<request xmlns="http://www.forum-datenaustausch.ch/invoice"
+    language="de"
+    modus="production"
+    guid="{{ guid }}">
+    <processing>
+        <transport from="{{ clean_gln }}" to="2000000000000" />
+    </processing>
+    <payload request_type="invoice" request_subtype="normal">
+        <invoice request_timestamp="{{ request_timestamp }}"
+            request_date="{{ now_iso }}"
+            request_id="{{ request_id }}" />
+        <body role="naturopathictherapist" place="practice">
+            <prolog>
+                <generator name="tarif595-human" version="1" />
+            </prolog>
+            <tiers_garant>
+                <billers>
+                    <biller_gln gln="{{ clean_gln }}">
+                        <company>
+                            <companyname>{{ data.company_name }}</companyname>
+                            <postal>
+                                <street>{{ data.company_street }}</street>
+                                <zip>{{ data.company_zip_code }}</zip>
+                                <city>{{ data.company_city }}</city>
+                            </postal>
+                        </company>
+                    </biller_gln>
+                </billers>
+                <debitor gln="{{ clean_gln }}">
+                    <company>
+                        <companyname>{{ data.company_name }}</companyname>
+                        <postal>
+                            <street>{{ data.company_street }}</street>
+                            <zip>{{ data.company_zip_code }}</zip>
+                            <city>{{ data.company_city }}</city>
+                        </postal>
+                    </company>
+                </debitor>
+                <providers>
+                    <provider_gln gln="{{ clean_gln }}" gln_location="{{ clean_gln }}">
+                        <company>
+                            <companyname>{{ data.company_name }}</companyname>
+                            <postal>
+                                <street>{{ data.company_street }}</street>
+                                <zip>{{ data.company_zip_code }}</zip>
+                                <city>{{ data.company_city }}</city>
+                            </postal>
+                        </company>
+                    </provider_gln>
+                </providers>
+                <patient gender="{{ data.client_gender }}"
+                    sex="{{ 'female' if data.client_gender == 'female' else 'male' }}"
+                    birthdate="{{ data.client_birthdate.strftime('%Y-%m-%d') }}"
+                    ssn="{{ clean_ssn }}">
+                    <person>
+                        <familyname>{{ data.client_last_name }}</familyname>
+                        <givenname>{{ data.client_first_name }}</givenname>
+                        <postal>
+                            <street>{{ data.client_street }}</street>
+                            <zip>{{ data.client_zip_code }}</zip>
+                            <city>{{ data.client_city }}</city>
+                        </postal>
+                    </person>
+                </patient>
+                <guarantor>
+                    <person>
+                        <familyname>{{ data.client_last_name }}</familyname>
+                        <givenname>{{ data.client_first_name }}</givenname>
+                        <postal>
+                            <street>{{ data.client_street }}</street>
+                            <zip>{{ data.client_zip_code }}</zip>
+                            <city>{{ data.client_city }}</city>
+                        </postal>
+                    </person>
+                </guarantor>
+                <partners />
+                <balance currency="CHF"
+                    amount="{{ '%.2f'|format(data.service_amount) }}"
+                    amount_due="{{ '%.2f'|format(data.service_amount) }}">
+                    <vat vat="0.0">
+                        <vat_rate vat_rate="0"
+                            amount="{{ '%.2f'|format(data.service_amount) }}"
+                            vat="0.0" />
+                    </vat>
+                </balance>
+            </tiers_garant>
+            <esrQRRed iban="{{ clean_iban }}" subtype="esrQRRed">
+                <creditor>
+                    <company>
+                        <companyname>{{ data.company_name }}</companyname>
+                        <postal>
+                            <street>{{ data.company_street }}</street>
+                            <zip>{{ data.company_zip_code }}</zip>
+                            <city>{{ data.company_city }}</city>
+                        </postal>
+                    </company>
+                </creditor>
+            </esrQRRed>
+            <law type="VVG" />
+            <treatment date_begin="{{ service_date_iso }}"
+                date_end="{{ service_date_iso }}"
+                canton="{{ data.canton }}"
+                treatment="ambulatory"
+                reason="disease" />
+            <services>
+                <service record_id="1"
+                    tariff_type="595"
+                    code="{{ data.tariff_code }}"
+                    name="{{ data.service_description }}"
+                    quantity="1.0"
+                    date_begin="{{ service_datetime_iso }}"
+                    provider_id="{{ clean_gln }}"
+                    responsible_id="{{ clean_gln }}"
+                    unit="1.0"
+                    unit_factor="1.0"
+                    amount="{{ '%.2f'|format(data.service_amount) }}"
+                    vat_rate="0" />
+            </services>
+        </body>
+    </payload>
+</request>

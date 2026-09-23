@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <title>Invoice</title>
+  <link rel="stylesheet" href="/static/pico.min.css">
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 20mm 20mm 0mm 20mm;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .invoice-content {
+      padding-bottom: 20mm;
+    }
+
+    .amount {
+      text-align: right;
+    }
+    .total {
+      font-weight: bold;
+    }
+
+    .qr-bill-container {
+      margin-left: -20mm;
+      margin-right: -20mm;
+      width: 210mm;
+      height: 105mm;
+      overflow: hidden;
+      page-break-inside: avoid;
+    }
+
+    .qr-bill-container img {
+      width: 210mm;
+      height: 105mm;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="invoice-content">
+    <header>
+      <div>
+        <small>
+          <strong>{{ company_name }}</strong> &bull;
+          {{ company_street }}, {{ company_zip_code }} {{ company_city }}
+        </small>
+      </div>
+      <div style="margin-top: 2.5rem;">
+        <strong>{{ client_first_name }} {{ client_last_name }}</strong><br>
+        {{ client_street }}<br>
+        {{ client_zip_code }} {{ client_city }}
+      </div>
+    </header>
+
+    <main style="margin-top: 2rem;">
+      <h2>Invoice / Tarif 595</h2>
+
+      <table class="striped">
+        <thead>
+          <tr>
+            <th scope="col">Datum</th>
+            <th scope="col">Beschreibung</th>
+            <th scope="col" class="amount">Betrag (CHF)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{{ service_date }}</td>
+            <td>{{ service_description }}</td>
+            <td class="amount">{{ "%.2f"|format(service_amount) }}</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr class="total">
+            <th scope="row" colspan="2">Total</th>
+            <td class="amount">CHF {{ "%.2f"|format(service_amount) }}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </main>
+  </div>
+
+  <div class="qr-bill-container">
+    <img src="{{ qr_svg_uri }}" alt="Swiss QR Bill">
+  </div>
+</body>
+</html>
