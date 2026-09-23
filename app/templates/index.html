@@ -19,6 +19,7 @@
           <input type="text" name="company_street" placeholder="Street" value="Bahnhofstrasse 1" required>
           <input type="text" name="company_zip_code" placeholder="ZIP Code" value="8001" required>
           <input type="text" name="company_city" placeholder="City" value="Zürich" required>
+          <input type="text" name="company_gln" placeholder="GLN (13 digits)" value="7601000000000" required>
           <input type="text" name="company_iban" placeholder="IBAN" value="CH9300762011623852957" required>
         </div>
       </fieldset>
@@ -28,9 +29,14 @@
         <div class="grid">
           <input type="text" name="client_first_name" placeholder="First Name" value="Hans" required>
           <input type="text" name="client_last_name" placeholder="Last Name" value="Muster" required>
+          <input type="date" name="client_birthdate" value="1980-01-01" required>
+          <input type="text" name="client_ssn" placeholder="AHV / SSN (756...)" value="756.1234.5678.90" required>
+        </div>
+        <div class="grid">
           <input type="text" name="client_street" placeholder="Street" value="Musterstrasse 10" required>
           <input type="text" name="client_zip_code" placeholder="ZIP Code" value="8000" required>
           <input type="text" name="client_city" placeholder="City" value="Zürich" required>
+          <input type="text" name="canton" placeholder="Canton" value="ZH" maxlength="2" required>
         </div>
       </fieldset>
 

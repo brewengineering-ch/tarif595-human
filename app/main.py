@@ -10,6 +10,7 @@ from pypdf import PdfWriter
 from app.schemas import InvoiceData
 from app.qrbill import generate_qr_bill_svg_data_uri
 from app.reimbursement import generate_document_id, generate_reimbursement_2d_code_svg
+from app.xml import build_general_invoice_xml, generate_machine_qr_codes
 
 app = FastAPI()
 templates = Jinja2Templates(directory="app/templates")
@@ -67,9 +68,25 @@ def render_reimbursement_pdf(data: InvoiceData) -> bytes:
     return pdf_bytes
 
 def render_machine_pdf(data: InvoiceData) -> bytes:
-    # Placeholder for the machine-readable XML QR-code page
-    # (can return a placeholder or third template)
-    return render_reimbursement_pdf(data)
+    doc_id = generate_document_id()
+    code_2d_uri = generate_reimbursement_2d_code_svg(doc_id)
+
+    # 1. Build standard-compliant XML conforming to generalInvoiceRequest_500.xsd
+    xml_content = build_general_invoice_xml(data, doc_id)
+
+    # 2. Chunk XML into high-density 2D barcodes
+    qr_codes = generate_machine_qr_codes(xml_content)
+
+    # 3. Render HTML template to PDF
+    html_text = templates.get_template("machine.html").render(
+        **data.model_dump(),
+        doc_id=doc_id,
+        code_2d_uri=code_2d_uri,
+        qr_codes=qr_codes,
+    )
+    pdf_bytes = HTML(string=html_text).write_pdf()
+    assert pdf_bytes is not None
+    return pdf_bytes
 
 def combine_pdfs(pdf_list: list[bytes]) -> bytes:
     writer = PdfWriter()
