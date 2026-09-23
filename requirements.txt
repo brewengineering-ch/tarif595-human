@@ -1,1 +1,2 @@
 fastapi[standard]
+weasyprint>=62.0
