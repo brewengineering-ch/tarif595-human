@@ -5,6 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from typing import Annotated
 from weasyprint import HTML
 from app.schemas import InvoiceData
+from app.qrbill import generate_qr_bill_svg_data_uri
 
 app = FastAPI()
 templates = Jinja2Templates(directory="app/templates")
@@ -26,9 +27,11 @@ def read_health():
 def generate_pdf_from_form(
     data: Annotated[InvoiceData, Form()]
 ):
+    qr_svg_uri = generate_qr_bill_svg_data_uri(data)
     # Render the HTML template with the form values
     rendered_html = templates.get_template("invoice.html").render(
-        **data.model_dump()
+        **data.model_dump(),
+        qr_svg_uri=qr_svg_uri
     )
 
     # Convert the rendered HTML to PDF bytes

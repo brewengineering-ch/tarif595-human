@@ -17,3 +17,4 @@ After than the app is available under `http://localhost:8000` and the API docs u
 
 # Information
 - 
+- Manual HTML form creation over automated form creation was choosen for readability

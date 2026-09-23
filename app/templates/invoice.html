@@ -6,61 +6,98 @@
   <link rel="stylesheet" href="/static/pico.min.css">
   <style>
     @page {
-      size: A4;
-      margin: 20mm;
+      size: A4 portrait;
+      margin: 20mm 20mm 0mm 20mm; /* 0 bottom margin for the full-width slip */
     }
-    /* Align invoice amounts */
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .invoice-content {
+      padding-bottom: 20mm;
+    }
+
     .amount {
       text-align: right;
     }
     .total {
       font-weight: bold;
     }
+
+    /* Official Swiss QR-bill SVG (210mm wide x 105mm high) */
+    .qr-bill-container {
+      margin-left: -20mm;  /* Bleed out of the 20mm page margin */
+      margin-right: -20mm;
+      width: 210mm;
+      height: 105mm;
+      overflow: hidden;
+      page-break-inside: avoid;
+    }
+
+    .qr-bill-container img {
+      width: 210mm;
+      height: 105mm;
+      display: block;
+    }
   </style>
 </head>
 <body>
-  <header>
-    <div>
-      <small><strong>{{ company_name }}</strong> &bull; {{ company_address }}</small>
-    </div>
-    <div style="margin-top: 2rem;">
-      <strong>{{ client_first_name }} {{ client_last_name }}</strong>
-    </div>
-  </header>
+  <!-- Upper Section: Standard Invoice -->
+  <div class="invoice-content">
+    <header>
+      <div>
+        <small>
+          <strong>{{ company_name }}</strong> &bull;
+          {{ company_street }}, {{ company_zip_code }} {{ company_city }}
+        </small>
+      </div>
+      <div style="margin-top: 2.5rem;">
+        <strong>{{ client_first_name }} {{ client_last_name }}</strong><br>
+        {{ client_street }}<br>
+        {{ client_zip_code }} {{ client_city }}
+      </div>
+    </header>
 
-  <main>
-    <h2>Rechnung / Tarif 595</h2>
+    <main style="margin-top: 2rem;">
+      <h2>Rechnung / Tarif 595</h2>
 
-    <!-- Pico CSS automatically styles standard <table>, <thead>, and <tfoot> -->
-    <table class="striped">
-      <thead>
-        <tr>
-          <th scope="col">Datum</th>
-          <th scope="col">Beschreibung</th>
-          <th scope="col" class="amount">Betrag (CHF)</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>{{ service_date }}</td>
-          <td>{{ service_description }}</td>
-          <td class="amount">{{ "%.2f"|format(service_amount) }}</td>
-        </tr>
-      </tbody>
-      <tfoot>
-        <tr class="total">
-          <th scope="row" colspan="2">Total</th>
-          <td class="amount">CHF {{ "%.2f"|format(service_amount) }}</td>
-        </tr>
-      </tfoot>
-    </table>
-  </main>
+      <table class="striped">
+        <thead>
+          <tr>
+            <th scope="col">Datum</th>
+            <th scope="col">Beschreibung</th>
+            <th scope="col" class="amount">Betrag (CHF)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{{ service_date }}</td>
+            <td>{{ service_description }}</td>
+            <td class="amount">{{ "%.2f"|format(service_amount) }}</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr class="total">
+            <th scope="row" colspan="2">Total</th>
+            <td class="amount">CHF {{ "%.2f"|format(service_amount) }}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </main>
+  </div>
 
-  <footer>
-    <small>
-      <strong>Zahlungsverbindung:</strong><br>
-      IBAN: {{ company_iban }}
-    </small>
-  </footer>
+  <!-- Bottom Section: Official SIX Swiss QR-Bill (Rendered directly by qrbill) -->
+  <div class="qr-bill-container">
+    <img src="{{ qr_svg_uri }}" alt="Swiss QR Bill">
+  </div>
 </body>
 </html>
